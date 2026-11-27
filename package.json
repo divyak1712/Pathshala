@@ -10,7 +10,9 @@
     "db:setup": "node server/db/migrate.js",
     "db:demo": "node server/db/demo.js",
     "lint": "oxlint",
-    "test:smoke": "node scripts/smoke.mjs"
+    "test:smoke": "node scripts/smoke.mjs",
+    "test:api": "npm --prefix api-tests test",
+    "test:e2e": "npm --prefix e2e test"
   },
   "dependencies": {
     "better-auth": "^1.7.28",

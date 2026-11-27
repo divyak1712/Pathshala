@@ -16,8 +16,11 @@ npm run lint         # oxlint
 npm run test:smoke   # scripts/smoke.mjs — API + permission suite against a RUNNING server and demo data
 ```
 
-- There is no unit-test runner and no single-test flag. `scripts/smoke.mjs` is one sequential script (`check(name, cond)` calls); to iterate on one area, temporarily comment out other sections or add a focused `check`. Pass a base URL as the first arg to target another port.
-- The smoke suite logs in as the demo users and the admin from `.env`, so run `db:setup` and `db:demo` first. It creates its own assignment each run and asserts fee balances relatively, so it is re-runnable.
+- Playwright suites: `api-tests/` (HTTP only, includes a `race` project for concurrency invariants) and `e2e/` (real **headed** Chromium; page objects in `e2e/page-objects`). Run with `npm run test:api` / `npm run test:e2e`. One file or test: `npm --prefix api-tests exec playwright test tests/fees.spec.ts -g "overpay"` (same for `e2e`).
+- Each Playwright suite needs `TEST_DATABASE_URL` in its gitignored `.env.api` / `.env.e2e`, pointing at a DIFFERENT database than the app's own; the config throws at load otherwise (`helpers/db-safety.ts` compares host+port+database against the app's `.env` and the shell). They spawn their own server (ports 3100 / 3200, `NODE_ENV=test` so auth rate limits stay off, `reuseExistingServer: false`) and apply the schema through the app's `db:setup` at config load, before the server starts. The UI suite stays `headless: false` and the API suite `headless: true` by design.
+- Outside the Playwright suites there is no unit-test runner and no single-test flag. `scripts/smoke.mjs` is one sequential script (`check(name, cond)` calls); to iterate on one area, temporarily comment out other sections or add a focused `check`. Pass a base URL as the first arg to target another port.
+- The smoke suite logs in as the demo users and as `admin@school.local`, so run `db:setup` and `db:demo` first. It does not load `.env`: the admin password comes from the shell's `ADMIN_PASSWORD`, defaulting to `ChangeMe123!`. It creates its own assignment each run and asserts fee balances relatively, so it is re-runnable.
+- The smoke suite, `db:setup` and `db:demo` all write to whatever database `DATABASE_URL` points at (there is no separate test DB), so don't aim them at real school data.
 - **Backend code does not hot-reload.** Vite HMR covers `src/` only; restart `npm run dev` after editing anything under `server/`.
 - `.env` needs `DATABASE_URL` and `BETTER_AUTH_SECRET`. `dotenv/config` must stay the first import in every entrypoint (`server/index.js`, `db/migrate.js`, `db/demo.js`) because `server/db.js` reads env at import time.
 

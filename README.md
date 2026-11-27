@@ -15,6 +15,21 @@ npm run dev                 # http://localhost:3000
 
 Production: `npm run build && npm start`.
 
+## Automated tests (Playwright)
+
+Two standalone suites, each with its own `package.json`. Both run against a **dedicated test database** and start their own app server
+(never reuse a running one), so they cannot touch real data.
+
+| Suite | Folder | Run | What it covers |
+|---|---|---|---|
+| API | `api-tests/` | `npm run test:api` | Every endpoint over HTTP: auth, role and ownership checks, validation, money math, Stripe webhook signatures, error-contract shape, and a `race` project for concurrency invariants (`npm --prefix api-tests run test:race`) |
+| UI | `e2e/` | `npm run test:e2e` | Real Chromium (**headed**, never headless) driving each role's dashboard and workflows through page objects |
+
+One-time setup per suite: `npm install` inside the folder (UI suite also `npx playwright install chromium`), then copy
+`.env.api.example` to `.env.api` (or `.env.e2e.example` to `.env.e2e`) and set `TEST_DATABASE_URL` to a database that is **not**
+the one in the app's `.env` (a second database on the same Postgres service is fine). The suites refuse to run if the two resolve
+to the same host and database. Ports: app dev server 3000, API suite 3100, UI suite 3200.
+
 ## Roles and permissions (enforced server-side in `server/lib/access.js`)
 
 | Role | Access |

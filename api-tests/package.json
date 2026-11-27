@@ -1,0 +1,19 @@
+{
+  "name": "pathshala-api-tests",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Playwright API regression suite for Pathshala (HTTP only, isolated test database)",
+  "scripts": {
+    "test": "playwright test",
+    "test:functional": "playwright test --project=functional",
+    "test:race": "playwright test --project=race",
+    "typecheck": "tsc --noEmit",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.1",
+    "@types/node": "^26.6.11",
+    "dotenv": "^18.0.10",
+    "typescript": "^7.0.2"
+  }
+}
