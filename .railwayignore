@@ -1,0 +1,9 @@
+api-tests
+e2e
+docs
+scripts
+test-results
+playwright-report
+.env
+.env.*
+!.env.example
